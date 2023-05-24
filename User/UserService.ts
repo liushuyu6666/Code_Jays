@@ -1,5 +1,6 @@
 import { User } from "./User";
 import { UserRepository } from "./UserRepository";
+import bcrypt from 'bcryptjs';
 
 export class UserService {
     static registerUser(username: string, password: string, email: string): User | string {
@@ -17,4 +18,13 @@ export class UserService {
     }
 
     // TODO: add verify function for authentication later.
+    static verifyUser(email: string, password: string): boolean {
+        const loginUser = UserRepository.getUserByEmail(email);
+        
+        if(!loginUser) {
+            return false;
+        }
+
+        return bcrypt.compareSync(password, loginUser?.password);
+    }
 }
