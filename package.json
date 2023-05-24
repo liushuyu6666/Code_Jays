@@ -1,0 +1,13 @@
+{
+  "name": "Code_Jays",
+  "version": "1.0.0",
+  "description": "A Code Jays online test. Including the registration, authentication and image upload.",
+  "main": "index.js",
+  "repository": "git@github.com:liushuyu6666/Code_Jays.git",
+  "author": "shuyu liu <liushuyu6666@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
