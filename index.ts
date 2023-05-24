@@ -1,11 +1,13 @@
 import express from "express";
-import { createContext } from "./context";
+import * as httpContext from 'express-http-context';
 import { UserController } from "./User/UserController";
+import { createContext } from "./context";
 
 const app = express();
 const port = 3000;
 
 app.use(express.json()); // To parse JSON data in the request body
+app.use(httpContext.middleware);
 app.use(createContext);
 
 app.post("/register", UserController.registerUser);

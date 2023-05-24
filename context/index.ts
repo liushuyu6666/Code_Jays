@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { MongoClient, Db } from "mongodb";
+import * as httpContext from 'express-http-context';
 
 // TODO: move to .env
 const MONGO_URI = "mongodb://127.0.0.1:27017/CodeJays"
 
-export interface Context {
-    userId: string;
-    dbOps: (callback: (db: Db) => Promise<void>) => Promise<void>;
-}
+// export interface Context {
+//     userId: string;
+//     dbOps: (callback: (db: Db) => Promise<void>) => Promise<void>;
+// }
 
 const dbOperation = (mongoUri: string) => {
     return async (callback: (db: Db) => Promise<void>) => {
@@ -21,13 +22,7 @@ const dbOperation = (mongoUri: string) => {
     }
 }
 
-export const createContext = (req: Request, res: Response, next: NextFunction) => {
-    const context: Context = {
-        userId: '',
-        dbOps: dbOperation(MONGO_URI)
-    };
-
-    (req as any).context = context;
-
-    next();
+export const createContext = () => {
+    httpContext.set('dbOps', dbOperation(MONGO_URI));
+    httpContext.set('userId', '');
 }
