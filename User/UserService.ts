@@ -9,6 +9,7 @@ export class UserService {
         if (existingUser) {
             return 'User with the same email already exists';
         }
+        console.log(`UserService get username: ${username}`);
 
         // Create a new User.
         // TODO: handle with the error from database.

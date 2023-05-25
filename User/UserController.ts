@@ -9,10 +9,7 @@ const users: User[] = []; // In-memory storage for registered users
 
 export class UserController {
     static async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-        console.log('register');
         const { username, password, email } = req.body;
-
-        console.log(httpContext);
     
         // Validate input
         if (!username || !password || !email) {

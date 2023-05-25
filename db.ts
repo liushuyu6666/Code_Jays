@@ -6,7 +6,7 @@ export async function connectToMongodb() {
   mongoose
     .connect(MONGO_URI)
     .then(() => {
-        console.log("Connected to MongoDB");
+        console.log("Connected to MongoDB Successfully.");
     })
     .catch((error) => {
         console.error("Failed to connect to MongoDB:", error);

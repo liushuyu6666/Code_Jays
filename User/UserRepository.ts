@@ -1,11 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from 'bcryptjs';
-import * as httpContext from 'express-http-context';
 
 import { User, UserModel } from './User';
-import { Db } from "mongodb";
-
-const users: User[] = [];
 
 export class UserRepository {
     static async addUser(username: string, password: string, email: string): Promise<User> {
@@ -16,9 +12,13 @@ export class UserRepository {
         // Generate id
         const id = uuidv4();
 
-        const newUser = new User(id, username, hashedPassword, email);
+        const user = new User(id, username, hashedPassword, email);
 
-        return UserModel.create(newUser);
+        const newUser = new UserModel(user);
+        await newUser.save();
+        return newUser;
+
+        // return await UserModel.create(newUser);
     }
 
     static async getUserByEmail(email: string): Promise<User | null> {
