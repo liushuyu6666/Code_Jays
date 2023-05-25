@@ -16,7 +16,6 @@
     "@types/uuid": "^9.0.1",
     "bcryptjs": "^2.4.3",
     "express": "^4.18.2",
-    "express-http-context": "^1.2.4",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.5.0",
     "mongoose": "^7.2.1",
