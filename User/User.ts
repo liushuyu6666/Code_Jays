@@ -1,18 +1,18 @@
 import mongoose, { Schema } from "mongoose";
 
 export class User {
-  public id: string;
+  public userId: string;
   public username: string;
   public password: string;
   public email: string;
 
   constructor(
-    id: string,
+    userId: string,
     username: string,
     hashedPassword: string,
     email: string
   ) {
-    this.id = id;
+    this.userId = userId;
     this.email = email;
     this.username = username;
     this.password = hashedPassword;
@@ -21,7 +21,7 @@ export class User {
 
 const userSchema = new Schema<User>(
   {
-    id: String,
+    userId: String,
     username: String,
     password: String,
     email: String,
