@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from "express";
 import { MongoClient, Db } from "mongodb";
 import * as httpContext from 'express-http-context';
 
@@ -25,4 +24,5 @@ const dbOperation = (mongoUri: string) => {
 export const createContext = () => {
     httpContext.set('dbOps', dbOperation(MONGO_URI));
     httpContext.set('userId', '');
+    console.log(httpContext.get('dbOps'));
 }
