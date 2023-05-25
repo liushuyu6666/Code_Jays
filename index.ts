@@ -1,8 +1,8 @@
 import express from "express";
-import { UserController } from "./User/UserController";
-import { connectToMongodb } from "./db";
-import { User } from "./User/User";
-import { UserRepository } from "./User/UserRepository";
+import { UserController } from "./src/User/UserController";
+import { connectToMongodb } from "./src/database/db";
+import { User } from "./src/User/User";
+import { UserRepository } from "./src/User/UserRepository";
 
 const app = express();
 const port = 3000;
