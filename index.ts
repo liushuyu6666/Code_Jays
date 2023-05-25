@@ -1,6 +1,6 @@
 import express from "express";
 import { UserController } from "./src/User/UserController";
-import { connectToMongodb } from "./src/database/db";
+import { connectToMongodb } from "./db";
 import { User } from "./src/User/User";
 import { UserRepository } from "./src/User/UserRepository";
 
