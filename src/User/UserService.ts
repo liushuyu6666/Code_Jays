@@ -11,12 +11,9 @@ import { Connection as MysqlConnection } from 'mysql';
 export class UserService {
     private userRepository: UserRepository;
 
-    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation) {
-        this.userRepository = UserRepositoryFactory.createUserRepository(
-            databaseType,
-            dbConnection,
-            dbOperation
-        );
+    constructor(databaseType: DatabaseType, dbOperation: DbOperation) {
+        this.userRepository =
+            UserRepositoryFactory.createUserRepository(databaseType, dbOperation);
     }
 
     async registerUser(
@@ -42,10 +39,10 @@ export class UserService {
         email?: string,
         password?: string,
     ): Promise<string | undefined> {
-        if(!email) {
+        if (!email) {
             return undefined;
         }
-        
+
         const loginUser = await this.userRepository.getUserByEmail(email);
 
         if (!loginUser || !password) {

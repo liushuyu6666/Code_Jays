@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { User } from './User';
 import { Connection as MysqlConnection } from 'mysql';
 import { DbOperation } from '../../db';
+import { MongoClient } from 'mongodb';
 
 // TODO: configurable
 const DATABASE_NAME = 'codejays';
@@ -38,7 +39,7 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
         const id = uuidv4();
 
         await this.dbOperation(async (client) => {
-            const col = client.db().collection('User');
+            const col = (client as MongoClient).db().collection('User');
             return col.insertOne({
                 username,
                 password: hashedPassword,
@@ -52,7 +53,7 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
 
     async getUserByEmail(email: string): Promise<User | null> {
         const user = await this.dbOperation(async (client) => {
-            const col = client.db().collection('User');
+            const col = (client as MongoClient).db().collection('User');
             return col.findOne({ email });
         });
 
@@ -62,20 +63,21 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
 }
 
 export class MysqlUserRepository extends DatabaseRepository implements UserRepository {
-    private mysqlConnection: MysqlConnection;
+    private dbOperation: DbOperation;
 
-    constructor(connection: MysqlConnection) {
+    constructor(dbOperation: DbOperation) {
         super();
-        this.mysqlConnection = connection;
+        this.dbOperation = dbOperation;
     }
 
-    private execSql(sql: string, values: string[]): Promise<any> {
-        return new Promise((res, rej) => {
-            this.mysqlConnection.query(sql, values, (error, result) => {
-                if (error) rej(error);
-                else res(result);
+    private async execSql(sql: string, values: string[]): Promise<any> {
+        return await this.dbOperation(async (client) => {
+            return new Promise((res, rej) => {
+                (client as MysqlConnection).query(sql, values, (error, result) => {
+                    if (error) rej(error);
+                    else res(result);
+                });
             });
-            // this.mysqlConnection.end();
         });
     }
 
@@ -149,12 +151,12 @@ export enum DatabaseType {
 }
 
 export class UserRepositoryFactory {
-    static createUserRepository(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation): UserRepository {
+    static createUserRepository(databaseType: DatabaseType, dbOperation: DbOperation): UserRepository {
         switch(databaseType) {
             case DatabaseType.MongoDB:
                 return new MongodbUserRepository(dbOperation);
             case DatabaseType.MySQL:
-                return new MysqlUserRepository(dbConnection as MysqlConnection);
+                return new MysqlUserRepository(dbOperation);
             default:
                 throw new Error('Invalid database type');
         }

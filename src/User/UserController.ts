@@ -8,8 +8,8 @@ import { DbOperation } from "../../db";
 export class UserController {
     private userService: UserService;
 
-    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation) {
-        this.userService = new UserService(databaseType, dbConnection, dbOperation);
+    constructor(databaseType: DatabaseType, dbOperation: DbOperation) {
+        this.userService = new UserService(databaseType, dbOperation);
     }
 
     async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
