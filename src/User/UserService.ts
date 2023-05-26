@@ -1,3 +1,4 @@
+import { DbOperation } from '../../db';
 import { User } from './User';
 import {
     DatabaseType,
@@ -10,10 +11,11 @@ import { Connection as MysqlConnection } from 'mysql';
 export class UserService {
     private userRepository: UserRepository;
 
-    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection) {
+    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation) {
         this.userRepository = UserRepositoryFactory.createUserRepository(
             databaseType,
             dbConnection,
+            dbOperation
         );
     }
 

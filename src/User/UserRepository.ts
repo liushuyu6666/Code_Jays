@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
-import { User, UserModel } from './User';
+import { User } from './User';
 import { Connection as MysqlConnection } from 'mysql';
+import { DbOperation } from '../../db';
 
 // TODO: configurable
 const DATABASE_NAME = 'codejays';
@@ -19,6 +20,13 @@ export interface UserRepository {
 }
 
 export class MongodbUserRepository extends DatabaseRepository implements UserRepository {
+    private dbOperation: DbOperation;
+
+    constructor(dbOperation: DbOperation)  {
+        super();
+        this.dbOperation = dbOperation;
+    }
+    
     async addUser(
         username: string,
         password: string,
@@ -29,17 +37,27 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
         // Generate id
         const id = uuidv4();
 
-        const user = new User(id, username, hashedPassword, email);
+        await this.dbOperation(async (client) => {
+            const col = client.db().collection('User');
+            return col.insertOne({
+                username,
+                password: hashedPassword,
+                email,
+                userId: id
+            });
+        })
 
-        const newUser = new UserModel(user);
-        await newUser.save();
-        return newUser;
-
-        // return await UserModel.create(newUser);
+        return new User(id, username, hashedPassword, email);
     }
 
     async getUserByEmail(email: string): Promise<User | null> {
-        return UserModel.findOne({ email }).exec();
+        const user = await this.dbOperation(async (client) => {
+            const col = client.db().collection('User');
+            return col.findOne({ email });
+        });
+
+        if(!user) return null;
+        return new User(user.userId, user.username, user.password, user.email);
     }
 }
 
@@ -131,12 +149,12 @@ export enum DatabaseType {
 }
 
 export class UserRepositoryFactory {
-    static createUserRepository(databaseType: DatabaseType, dbConnection: MysqlConnection): UserRepository {
+    static createUserRepository(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation): UserRepository {
         switch(databaseType) {
             case DatabaseType.MongoDB:
-                return new MongodbUserRepository();
+                return new MongodbUserRepository(dbOperation);
             case DatabaseType.MySQL:
-                return new MysqlUserRepository(dbConnection);
+                return new MysqlUserRepository(dbConnection as MysqlConnection);
             default:
                 throw new Error('Invalid database type');
         }

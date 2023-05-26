@@ -3,12 +3,13 @@ import { UserService } from "./UserService";
 import { AuthService } from "../Auth/AuthService";
 import { Connection as MysqlConnection } from 'mysql';
 import { DatabaseType } from "./UserRepository";
+import { DbOperation } from "../../db";
 
 export class UserController {
     private userService: UserService;
 
-    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection) {
-        this.userService = new UserService(databaseType, dbConnection);
+    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection, dbOperation: DbOperation) {
+        this.userService = new UserService(databaseType, dbConnection, dbOperation);
     }
 
     async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
