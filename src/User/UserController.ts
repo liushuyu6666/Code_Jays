@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
-import { User } from "./User";
 import { UserService } from "./UserService";
 import { AuthService } from "../Auth/AuthService";
-
-
-const users: User[] = []; // In-memory storage for registered users
+import { Connection as MysqlConnection } from 'mysql';
+import { DatabaseType } from "./UserRepository";
 
 export class UserController {
-    static async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    private userService: UserService;
+
+    constructor(databaseType: DatabaseType, dbConnection: MysqlConnection) {
+        this.userService = new UserService(databaseType, dbConnection);
+    }
+
+    async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         const { username, password, email } = req.body;
     
         // Validate input
@@ -17,7 +21,7 @@ export class UserController {
                 .json({ error: "Username, password, and email are required" });
         }
     
-        const newUserOrError = await UserService.registerUser(username, password, email);
+        const newUserOrError = await this.userService.registerUser(username, password, email);
         if(typeof newUserOrError === 'string') {
             return res.status(409).json({ error: newUserOrError });
         }
@@ -26,10 +30,10 @@ export class UserController {
         return res.status(201).json({ message: `User registered successfully`});
     };
 
-    static async loginUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    async loginUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         const { password, email } = req.body;
 
-        const userId = await UserService.verifyUserAndReturnUserId(email, password);
+        const userId = await this.userService.verifyUserAndReturnUserId(email, password);
         if(!userId) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }

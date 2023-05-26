@@ -1,5 +1,14 @@
 # Overview
-This is a Express Typescript web application.
+This is a Express Typescript web application. The features contains:
+1. Mongodb and Mysql
+2. User login and authentication
+3. Save and read Image in S3.
+   
+# How to run
+## Install and start Mongodb and Mysql
+1. Install Mysql and run it.
+2. To connect to MySQL, use the following command in your terminal: `mysql -u root -p`. During installation, you may encounter prompts guiding you on how to establish the connection.
+3. Create the database and user, the scripts store in `sql` folder.
 
 # All dependencies
 1. `typescript`: For using TypeScript.
