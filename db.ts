@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import mysql from "mysql";
+import mongoose, { createConnection } from "mongoose";
+import mysql, { Connection } from "mysql";
 
 export async function connectToMongodb() {
   // TODO: move to .env
@@ -8,30 +8,30 @@ export async function connectToMongodb() {
   mongoose
     .connect(MONGO_URI)
     .then(() => {
-      console.log("Connected to MongoDB.");
+        console.log("Connected to MongoDB.");
     })
     .catch((error) => {
-      console.error("Failed to connect to MongoDB:", error);
+        console.error("Failed to connect to MongoDB:", error);
     });
 }
 
-export async function connectToMysql() {
-  const MYSQL_URI = "";
+// TODO: maybe we can make it a higher order function and close the connection at the end
+export const mysqlConnection: Connection = mysql.createConnection({
+    host: "localhost",
+    user: "codejays",
+    password: "password",
+    database: "codejays",
+});
 
-  mysql
-    .createConnection({
-        host: "localhost",
-        user: "codejays",
-        password: "password",
-        database: "codejays",
-        
-    })
-    .connect((err) => {
+export async function connectToMysql() {
+    mysqlConnection.connect((err) => {
         if (err) {
-            // TODO: logger please
+        // TODO: logger please
             console.error("Error connecting to MySQL database:", err);
             return;
         }
         console.log("Connected to MySQL database.");
     });
+
+    // TODO: close mysql connection
 }
