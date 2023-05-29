@@ -3,3 +3,7 @@ node_modules/
 # terraform
 terraform/*
 !terraform/*.tf
+
+# .env
+.env.*
+!.env.*.example

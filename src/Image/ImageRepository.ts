@@ -3,6 +3,10 @@ import { DbOperation } from '../../db';
 import { Image } from './Image';
 import { Connection as MysqlConnection } from 'mysql';
 import { DatabaseType } from '../User/UserRepository';
+import dotenv from 'dotenv';
+
+// Load the environment variables from the .env file
+dotenv.config();
 
 const DATABASE_NAME = 'codejays';
 
@@ -26,9 +30,10 @@ export class MongodbImageRepository implements ImageRepository {
     async createImage(
         imageId: string,
         fileName: string,
-        url: string,
+        key: string,
         uploadDate: Date,
     ): Promise<Image> {
+        const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
         await this.dbOperation(async (client) => {
             const col = (client as MongoClient).db().collection('Image');
             return col.insertOne({
@@ -77,7 +82,7 @@ export class MysqlImageRepository implements ImageRepository {
         const tableExists = await this.existsTable('image');
         if(tableExists) return;
         const sql = `
-            CREATE TABLE user (
+            CREATE TABLE image (
                 imageId VARCHAR(255) PRIMARY KEY,
                 fileName VARCHAR(255) NOT NULL,
                 url VARCHAR(255) NOT NULL,
@@ -87,7 +92,7 @@ export class MysqlImageRepository implements ImageRepository {
         await this.execSql(sql, []);
         
         // TODO: logger
-        console.log("Create user table in mysql");
+        console.log("Create image table in mysql");
     }
 
     async createImage(
@@ -96,7 +101,9 @@ export class MysqlImageRepository implements ImageRepository {
         url: string,
         uploadDate: Date,
     ): Promise<Image> {
-        const sql = "INSERT INTO images (imageId, fileName, url, uploadDate) VALUES (%s, %s, %s, %s)";
+        await this.createImageTableIfNotExists();
+
+        const sql = "INSERT INTO image (imageId, fileName, url, uploadDate) VALUES (?, ?, ?, ?)";
         const values = [imageId, fileName, url, uploadDate];
 
         await this.execSql(sql, values);

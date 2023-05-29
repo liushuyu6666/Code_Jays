@@ -13,6 +13,7 @@ provider "aws" {
   region  = "ca-central-1"
 }
 
+# TODO: configure in the .env
 resource "aws_s3_bucket" "jays" {
   bucket = "jays"
 
