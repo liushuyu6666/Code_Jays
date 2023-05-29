@@ -19,11 +19,14 @@ export class ImageService {
         this.s3Repository = new S3Repository(s3Client, bucketName);
     }
 
-    async uploadImage(imageName: string, imageContent: Express.Multer.File): Promise<Image> {
+    async uploadImage(imageName: string, imageContent: Express.Multer.File): Promise<Image | undefined> {
         // Generate id
         const imageId = uuidv4();
 
         const url = await this.s3Repository.uploadFile(imageId, imageContent, 'images');
+        if(!url) {
+            return undefined;
+        }
 
         return await this.imageRepository.createImage(imageId, imageName, url, new Date());
     }

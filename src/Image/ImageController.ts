@@ -34,10 +34,20 @@ export class ImageController {
                 .json({ error: 'Image or image name are required' });
         }
 
-        await this.imageService.uploadImage(imageName, file);
+        const insertedImage = await this.imageService.uploadImage(
+            imageName,
+            file,
+        );
 
-        return res
-            .status(201)
-            .json({ message: `Image ${imageName} uploaded successfully` });
+        if (!insertedImage) {
+            return res
+            .status(500)
+            .json({ message: `No such bucket, please use terraform to create one.` });
+        }
+
+        return res.status(201).json({
+            message: `Image ${imageName} uploaded successfully`,
+        });
+        
     }
 }

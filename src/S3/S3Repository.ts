@@ -1,5 +1,4 @@
-import { PutObjectAclCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import AWS from 'aws-sdk';
+import { HeadBucketCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 export class S3Repository {
     private s3Client: S3Client;
@@ -11,7 +10,21 @@ export class S3Repository {
         this.bucketName = bucketName
     }
 
-    async uploadFile(fileId: string, fileContent: Express.Multer.File, prefix?: string): Promise<string> {
+    private async existsBucket(bucketName: string): Promise<boolean> {
+        const headBucketCommand = new HeadBucketCommand({ Bucket: bucketName });
+        try {
+            await this.s3Client.send(headBucketCommand);
+            return true;
+        } catch {
+            return false
+        }
+    }
+
+    async uploadFile(fileId: string, fileContent: Express.Multer.File, prefix?: string): Promise<string | undefined> {
+        if(!(await this.existsBucket(this.bucketName))) {
+            return undefined;
+        }
+
         const key = prefix ? `${prefix}/${fileId}` : `files/${fileId}`
 
         const uploadParams = {
