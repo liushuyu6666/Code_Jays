@@ -98,11 +98,12 @@ export class MysqlImageRepository implements ImageRepository {
     async createImage(
         imageId: string,
         fileName: string,
-        url: string,
+        key: string,
         uploadDate: Date,
     ): Promise<Image> {
         await this.createImageTableIfNotExists();
 
+        const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         const sql = "INSERT INTO image (imageId, fileName, url, uploadDate) VALUES (?, ?, ?, ?)";
         const values = [imageId, fileName, url, uploadDate];
 
