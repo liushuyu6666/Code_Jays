@@ -16,7 +16,7 @@ export function mongodbOperation(): DbOperation {
         } catch(error) {
             throw error;
         } finally {
-            connection.close();
+            await connection.close();
         }
     };
 }

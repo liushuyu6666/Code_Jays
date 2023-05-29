@@ -30,4 +30,8 @@ export class ImageService {
 
         return await this.imageRepository.createImage(imageId, imageName, url, new Date());
     }
+
+    async listImages(): Promise<Image[] | undefined> {
+        return await this.imageRepository.listImages();
+    }
 }

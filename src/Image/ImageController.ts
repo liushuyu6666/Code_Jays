@@ -40,14 +40,33 @@ export class ImageController {
         );
 
         if (!insertedImage) {
-            return res
-            .status(500)
-            .json({ message: `No such bucket, please use terraform to create one.` });
+            return res.status(500).json({
+                message: `No such bucket, please use terraform to create one.`,
+            });
         }
 
         return res.status(201).json({
             message: `Image ${imageName} uploaded successfully`,
         });
-        
+    }
+
+    async listImages(
+        _: Request,
+        res: Response,
+    ): Promise<Response<any, Record<string, any>>> {
+        const images = await this.imageService.listImages();
+
+        if (!images) {
+            return res
+                .status(204)
+                .json({
+                    message: `No such images`,
+                })
+                .end();
+        } else {
+            return res.json({
+                images
+            })
+        }
     }
 }
