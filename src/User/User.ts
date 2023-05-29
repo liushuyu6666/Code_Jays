@@ -1,5 +1,3 @@
-import mongoose, { Schema } from 'mongoose';
-
 export class User {
     public userId: string;
     public username: string;
