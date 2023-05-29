@@ -12,7 +12,15 @@ This is a Express Typescript web application. The features contains:
 
 ## 2. Launch a AWS S3 Bucket
 1. Since we're utilizing Terraform for the AWS S3 bucket creation in this project, please install the Terraform kits by following [these instructions](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
-2. In addition to Terraform, there are specific requirements for [AWS](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build#prerequisites) that need to be met.
+2. In addition to Terraform, there are specific requirements for [AWS](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build#prerequisites) that need to be met. In a nutshell:
+   1. You need to have a `AWS` account.
+   2. Install the `AWS CLI`.
+   3. Configure the credential.
+3. Go to `terraform` folder then:
+   1. `terraform init`
+   2. `terraform plan`
+   3. `terraform apply`
+   The S3 bucket should be created under your account.
 
 # All dependencies
 1. `typescript`: For using TypeScript.
