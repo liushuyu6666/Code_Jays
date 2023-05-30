@@ -1,19 +1,17 @@
-import { DbOperation } from '../../db';
+import { DatabaseType } from '../Database/DatabaseRepository';
 import { User } from './User';
 import {
-    DatabaseType,
     UserRepository,
     UserRepositoryFactory,
 } from './UserRepository';
 import bcrypt from 'bcryptjs';
-import { Connection as MysqlConnection } from 'mysql';
 
 export class UserService {
     private userRepository: UserRepository;
 
-    constructor(databaseType: DatabaseType, dbOperation: DbOperation) {
+    constructor(databaseType: DatabaseType) {
         this.userRepository =
-            UserRepositoryFactory.createUserRepository(databaseType, dbOperation);
+            UserRepositoryFactory.createUserRepository(databaseType);
     }
 
     async registerUser(

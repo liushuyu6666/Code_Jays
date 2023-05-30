@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
 import { UserService } from "./UserService";
 import { AuthService } from "../Auth/AuthService";
-import { Connection as MysqlConnection } from 'mysql';
-import { DatabaseType } from "./UserRepository";
-import { DbOperation } from "../../db";
+import { DatabaseType } from "../Database/DatabaseRepository";
 
 export class UserController {
     private userService: UserService;
 
-    constructor(databaseType: DatabaseType, dbOperation: DbOperation) {
-        this.userService = new UserService(databaseType, dbOperation);
+    constructor(databaseType: DatabaseType) {
+        this.userService = new UserService(databaseType);
     }
 
     async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {

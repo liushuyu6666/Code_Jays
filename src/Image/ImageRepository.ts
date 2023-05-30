@@ -1,10 +1,9 @@
 import { MongoClient } from 'mongodb';
-import { DbOperation } from '../../db';
 import { Image } from './Image';
-import { Connection as MysqlConnection } from 'mysql';
-import { DatabaseType } from '../User/UserRepository';
-
-const DATABASE_NAME = 'codejays';
+import {
+    DatabaseRepository,
+    DatabaseType,
+} from '../Database/DatabaseRepository';
 
 export interface ImageRepository {
     createImage(
@@ -17,33 +16,12 @@ export interface ImageRepository {
     listImages(): Promise<Image[] | undefined>;
 }
 
-export class MongodbImageRepository implements ImageRepository {
-    private dbOperation: DbOperation;
-
-    constructor(dbOperation: DbOperation) {
-        // TODO: put dbOperation into DatabaseRepository
-        this.dbOperation = dbOperation;
-    }
-
-    private async existsCollection(colName: string): Promise<boolean> {
-        return await this.dbOperation(async (client) => {
-            const col = await (client as MongoClient)
-                .db()
-                .listCollections({
-                    name: colName,
-                })
-                .toArray();
-            return col.length > 0;
-        });
-    }
-
-    private async createCollectionIfNotExists(colName: string): Promise<void> {
-        const colExists = await this.existsCollection(colName);
-        if(colExists) return;
-        
-        await this.dbOperation(async (client) => {
-            (client as MongoClient).db().createCollection(colName);
-        });
+export class MongodbImageRepository
+    extends DatabaseRepository
+    implements ImageRepository
+{
+    constructor() {
+        super(DatabaseType.MongoDB);
     }
 
     async createImage(
@@ -53,7 +31,7 @@ export class MongodbImageRepository implements ImageRepository {
         uploadDate: Date,
     ): Promise<Image> {
         this.createCollectionIfNotExists('Image');
-    
+
         const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         await this.dbOperation(async (client) => {
             const col = (client as MongoClient).db().collection('Image');
@@ -79,69 +57,29 @@ export class MongodbImageRepository implements ImageRepository {
                 .find({})
                 .toArray();
         });
-        
-        if(!imagesWithId) {
+
+        if (!imagesWithId) {
             return undefined;
         }
 
         return imagesWithId.map((image) => {
-            return new Image(image.imageId, image.fileName, image.url, image.uploadDate);
+            return new Image(
+                image.imageId,
+                image.fileName,
+                image.url,
+                image.uploadDate,
+            );
         });
     }
 }
 
-export class MysqlImageRepository implements ImageRepository {
-    private dbOperation: DbOperation;
-
-    constructor(dbOperation: DbOperation) {
+export class MysqlImageRepository
+    extends DatabaseRepository
+    implements ImageRepository
+{
+    constructor() {
         // TODO: put dbOperation into DatabaseRepository
-        this.dbOperation = dbOperation;
-    }
-
-    // TODO: move this to DatabaseRepository
-    private async execSql(
-        sql: string,
-        values: (string | Date)[],
-    ): Promise<any> {
-        return await this.dbOperation(async (client) => {
-            return new Promise((res, rej) => {
-                (client as MysqlConnection).query(
-                    sql,
-                    values,
-                    (error, result) => {
-                        if (error) rej(error);
-                        else res(result);
-                    },
-                );
-            });
-        });
-    }
-
-    // TODO: move this to DatabaseRepository
-    private async existsTable(table: string): Promise<boolean> {
-        const sql = `SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ? LIMIT 1`;
-        const values = [DATABASE_NAME, table];
-
-        const result = await this.execSql(sql, values);
-        return result.length > 0;
-    }
-
-    // TODO: move this to DatabaseRepository
-    private async createImageTableIfNotExists(): Promise<void> {
-        const tableExists = await this.existsTable('image');
-        if (tableExists) return;
-        const sql = `
-            CREATE TABLE image (
-                imageId VARCHAR(255) PRIMARY KEY,
-                fileName VARCHAR(255) NOT NULL,
-                url VARCHAR(255) NOT NULL,
-                uploadDate TIMESTAMP NOT NULL
-            )
-        `;
-        await this.execSql(sql, []);
-
-        // TODO: logger
-        console.log('Create image table in mysql');
+        super(DatabaseType.MySQL);
     }
 
     async createImage(
@@ -164,7 +102,9 @@ export class MysqlImageRepository implements ImageRepository {
 
     // TODO: pagination
     async listImages(): Promise<Image[] | undefined> {
-        await this.existsTable('image');
+        if(!await this.existsTable('image')) {
+            return undefined;
+        }
 
         const sql = 'SELECT * FROM image';
 
@@ -186,15 +126,12 @@ export class MysqlImageRepository implements ImageRepository {
 }
 
 export class ImageRepositoryFactory {
-    static createImageRepository(
-        databaseType: DatabaseType,
-        dbOperation: DbOperation,
-    ): ImageRepository {
+    static createImageRepository(databaseType: DatabaseType): ImageRepository {
         switch (databaseType) {
             case DatabaseType.MongoDB:
-                return new MongodbImageRepository(dbOperation);
+                return new MongodbImageRepository();
             case DatabaseType.MySQL:
-                return new MysqlImageRepository(dbOperation);
+                return new MysqlImageRepository();
             default:
                 throw new Error('Invalid database type');
         }

@@ -1,19 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
 import { User } from './User';
-import { Connection as MysqlConnection } from 'mysql';
-import { DbOperation } from '../../db';
 import { MongoClient } from 'mongodb';
+import { DatabaseRepository, DatabaseType } from '../Database/DatabaseRepository';
 
 // TODO: configurable
-const DATABASE_NAME = 'codejays';
-
-class DatabaseRepository {
-    encryptPassword(password: string): string {
-        const salt = bcrypt.genSaltSync(10);
-        return bcrypt.hashSync(password, salt);
-    }
-}
+// const DATABASE_NAME = 'codejays';
 
 export interface UserRepository {
     addUser(username: string, password: string, email: string): Promise<User>;
@@ -21,11 +12,8 @@ export interface UserRepository {
 }
 
 export class MongodbUserRepository extends DatabaseRepository implements UserRepository {
-    private dbOperation: DbOperation;
-
-    constructor(dbOperation: DbOperation)  {
-        super();
-        this.dbOperation = dbOperation;
+    constructor()  {
+        super(DatabaseType.MongoDB);
     }
     
     async addUser(
@@ -63,47 +51,8 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
 }
 
 export class MysqlUserRepository extends DatabaseRepository implements UserRepository {
-    private dbOperation: DbOperation;
-
-    constructor(dbOperation: DbOperation) {
-        super();
-        this.dbOperation = dbOperation;
-    }
-
-    private async execSql(sql: string, values: string[]): Promise<any> {
-        return await this.dbOperation(async (client) => {
-            return new Promise((res, rej) => {
-                (client as MysqlConnection).query(sql, values, (error, result) => {
-                    if (error) rej(error);
-                    else res(result);
-                });
-            });
-        });
-    }
-
-    private async existsTable(table: string): Promise<boolean> {
-        const sql = `SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ? LIMIT 1`;
-        const values = [DATABASE_NAME, table];
-
-        const result = await this.execSql(sql, values);
-        return result.length > 0;
-    }
-
-    private async createUserTableIfNotExists(): Promise<void> {
-        const tableExists = await this.existsTable('user');
-        if(tableExists) return;
-        const sql = `
-            CREATE TABLE user (
-                userId VARCHAR(255) PRIMARY KEY,
-                username VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL
-            )
-        `;
-        await this.execSql(sql, []);
-        
-        // TODO: logger
-        console.log("Create user table in mysql");
+    constructor()  {
+        super(DatabaseType.MySQL);
     }
 
     async addUser(
@@ -145,18 +94,13 @@ export class MysqlUserRepository extends DatabaseRepository implements UserRepos
     }
 }
 
-export enum DatabaseType {
-    MongoDB,
-    MySQL
-}
-
 export class UserRepositoryFactory {
-    static createUserRepository(databaseType: DatabaseType, dbOperation: DbOperation): UserRepository {
+    static createUserRepository(databaseType: DatabaseType): UserRepository {
         switch(databaseType) {
             case DatabaseType.MongoDB:
-                return new MongodbUserRepository(dbOperation);
+                return new MongodbUserRepository();
             case DatabaseType.MySQL:
-                return new MysqlUserRepository(dbOperation);
+                return new MysqlUserRepository();
             default:
                 throw new Error('Invalid database type');
         }

@@ -1,21 +1,18 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import { DbOperation } from '../../db';
-import { DatabaseType } from '../User/UserRepository';
 import { ImageService } from './ImageService';
 import { Request, Response } from 'express';
+import { DatabaseType } from '../Database/DatabaseRepository';
 
 export class ImageController {
     private imageService: ImageService;
 
     constructor(
         databaseType: DatabaseType,
-        dbOperation: DbOperation,
         s3Client: S3Client,
         bucketName: string,
     ) {
         this.imageService = new ImageService(
             databaseType,
-            dbOperation,
             s3Client,
             bucketName,
         );
@@ -65,8 +62,8 @@ export class ImageController {
                 .end();
         } else {
             return res.json({
-                images
-            })
+                images,
+            });
         }
     }
 }

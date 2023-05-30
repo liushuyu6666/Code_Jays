@@ -1,10 +1,9 @@
 import express from 'express';
 import { UserController } from './src/User/UserController';
-import { mongodbOperation, mysqlOperation } from './db';
-import { DatabaseType } from './src/User/UserRepository';
 import { ImageController } from './src/Image/ImageController';
 import * as aws from './aws';
 import multer from 'multer';
+import { DatabaseType } from './src/Database/DatabaseRepository';
 
 const app = express();
 const port = 3000;
@@ -17,10 +16,9 @@ const upload = multer({});
 app.use(express.json()); // To parse JSON data in the request body
 
 // TODO: mongodbOperation / mysqlOperation should be have a high level description
-const userController = new UserController(databaseType, mongodbOperation());
+const userController = new UserController(databaseType);
 const imageController = new ImageController(
     databaseType,
-    mongodbOperation(),
     aws.s3Client,
     'jays',
 );
