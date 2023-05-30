@@ -17,7 +17,7 @@ export enum DatabaseType {
 } 
 
 export class DatabaseRepository {
-    protected dbOperation: DbOperation;
+    public dbOperation: DbOperation;
 
     constructor(databaseType: DatabaseType) {
         switch(databaseType) {
@@ -65,7 +65,7 @@ export class DatabaseRepository {
         }
     }
 
-    protected async existsCollection(colName: string): Promise<boolean> {
+    public async existsCollection(colName: string): Promise<boolean> {
         return await this.dbOperation(async (client) => {
             const col = await (client as MongoClient)
                 .db()
@@ -77,7 +77,7 @@ export class DatabaseRepository {
         });
     }
 
-    protected async createCollectionIfNotExists(colName: string): Promise<void> {
+    public async createCollectionIfNotExists(colName: string): Promise<void> {
         const colExists = await this.existsCollection(colName);
         if (colExists) return;
 
@@ -86,12 +86,12 @@ export class DatabaseRepository {
         });
     }
 
-    protected encryptPassword(password: string): string {
+    public encryptPassword(password: string): string {
         const salt = bcrypt.genSaltSync(10);
         return bcrypt.hashSync(password, salt);
     }
 
-    protected async execSql(sql: string, values: (string | Date)[]): Promise<any> {
+    public async execSql(sql: string, values: (string | Date)[]): Promise<any> {
         return await this.dbOperation(async (client) => {
             return new Promise((res, rej) => {
                 (client as MysqlConnection).query(sql, values, (error, result) => {
@@ -102,7 +102,7 @@ export class DatabaseRepository {
         });
     }
 
-    protected async existsTable(table: string): Promise<boolean> {
+    public async existsTable(table: string): Promise<boolean> {
         const sql = `SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ? LIMIT 1`;
         const values = [DATABASE_NAME, table];
 
@@ -110,7 +110,7 @@ export class DatabaseRepository {
         return result.length > 0;
     }
 
-    protected async createUserTableIfNotExists(): Promise<void> {
+    public async createUserTableIfNotExists(): Promise<void> {
         const tableExists = await this.existsTable('user');
         if(tableExists) return;
         const sql = `
@@ -127,7 +127,7 @@ export class DatabaseRepository {
         console.log("Create user table in mysql");
     }
 
-    protected async createImageTableIfNotExists(): Promise<void> {
+    public async createImageTableIfNotExists(): Promise<void> {
         const tableExists = await this.existsTable('image');
         if (tableExists) return;
         const sql = `

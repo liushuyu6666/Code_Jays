@@ -28,7 +28,9 @@ This is a Express Typescript web application. The features contains:
 3. `express` and `@types/express`: For adding Express framework under `typescript`.
 4. `uuid` and `@types/uuid`: For generating unique IDs.
 5. `bcryptjs` and `@types/bcryptjs`: For encrypting the password.
-6. `mongoose` and `@types/mongoose`: For mongodb schema and connection:
-https://mongoosejs.com/docs/api/mongoose.html
-1. `mongodb` and `@types/mongodb`: A peer dependency of `mongoose` and is required for Mongoose to connect and interact with a MongoDB database.
-2. `jsonwebtoken`: For using jwt.
+6. `mongoose` and `@types/mongoose`: For mongodb schema and connection: https://mongoosejs.com/docs/api/mongoose.html
+7. `mongodb` and `@types/mongodb`: A peer dependency of `mongoose` and is required for Mongoose to connect and interact with a MongoDB database.
+8. `jsonwebtoken`: For using jwt.
+9. `jest`, `ts-jest`, `@types/jest`: For providing testing framework, understanding Typescript and compile it on the fly and providing Typescript typings for Jest respectively.
+10. `supertest`: For making HTTP requests, which is useful for testing the Express routes and middleware.
+11. `mongodb-memory-server`: For providing an in-memory MongoDB server
