@@ -7,3 +7,5 @@ terraform/*
 # .env
 .env.*
 !.env.*.example
+
+coverage/
