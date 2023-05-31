@@ -4,7 +4,6 @@ import {
     DatabaseType,
 } from '../../src/Database/DatabaseRepository';
 import bcrypt from 'bcryptjs';
-import mysql, { Connection as MysqlConnection } from 'mysql';
 
 describe('Test DatabaseRepository', () => {
     let databaseRepository: DatabaseRepository;

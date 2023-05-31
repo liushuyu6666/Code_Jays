@@ -51,7 +51,9 @@ export class MongodbImageRepository
 
     // TODO: pagination
     async listImages(userId: string): Promise<Image[] | undefined> {
-        await this.createCollectionIfNotExists('Image');
+        if(!await this.existsCollection('Image')) {
+            return undefined;
+        }
 
         const imagesWithId = await this.dbOperation(async (client) => {
             return (client as MongoClient)

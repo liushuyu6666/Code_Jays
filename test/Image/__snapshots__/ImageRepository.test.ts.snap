@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test MongodbImageRepository createImage should return the image 1`] = `
+Image {
+  "fileName": "image",
+  "imageId": "1",
+  "uploadDate": 2000-01-01T00:00:00.000Z,
+  "url": "https://undefined.s3.undefined.amazonaws.com/key",
+}
+`;
+
+exports[`Test MongodbImageRepository listImage should return all images if exists 1`] = `
+[
+  Image {
+    "fileName": "image1",
+    "imageId": "1",
+    "uploadDate": 2000-01-01T00:00:00.000Z,
+    "url": "https://undefined.s3.undefined.amazonaws.com/key1",
+  },
+  Image {
+    "fileName": "image2",
+    "imageId": "2",
+    "uploadDate": 2000-01-01T00:00:00.000Z,
+    "url": "https://undefined.s3.undefined.amazonaws.com/key2",
+  },
+]
+`;
+
+exports[`Test MysqlImageRepository createImage should return the image 1`] = `
+Image {
+  "fileName": "image",
+  "imageId": "1",
+  "uploadDate": 2000-01-01T00:00:00.000Z,
+  "url": "https://undefined.s3.undefined.amazonaws.com/key",
+}
+`;
+
+exports[`Test MysqlImageRepository listImage should return all images if the table exists 1`] = `
+[
+  Image {
+    "fileName": "image1",
+    "imageId": "1",
+    "uploadDate": 2000-01-01T00:00:00.000Z,
+    "url": "https://undefined.s3.undefined.amazonaws.com/key1",
+  },
+  Image {
+    "fileName": "image2",
+    "imageId": "2",
+    "uploadDate": 2000-01-01T00:00:00.000Z,
+    "url": "https://undefined.s3.undefined.amazonaws.com/key2",
+  },
+]
+`;
