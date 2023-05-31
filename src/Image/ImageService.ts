@@ -22,6 +22,7 @@ export class ImageService {
     async uploadImage(
         imageName: string,
         imageContent: Express.Multer.File,
+        userId: string
     ): Promise<Image | undefined> {
         // Generate id
         const imageId = uuidv4();
@@ -37,13 +38,14 @@ export class ImageService {
 
         return await this.imageRepository.createImage(
             imageId,
+            userId,
             imageName,
             url,
             new Date(),
         );
     }
 
-    async listImages(): Promise<Image[] | undefined> {
-        return await this.imageRepository.listImages();
+    async listImages(userId: string): Promise<Image[] | undefined> {
+        return await this.imageRepository.listImages(userId);
     }
 }

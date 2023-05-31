@@ -32,27 +32,6 @@ export class DatabaseRepository {
         }
     }
 
-    protected async existsCollection(colName: string): Promise<boolean> {
-        return await this.dbOperation(async (client) => {
-            const col = await (client as MongoClient)
-                .db()
-                .listCollections({
-                    name: colName,
-                })
-                .toArray();
-            return col.length > 0;
-        });
-    }
-
-    protected async createCollectionIfNotExists(colName: string): Promise<void> {
-        const colExists = await this.existsCollection(colName);
-        if (colExists) return;
-
-        await this.dbOperation(async (client) => {
-            (client as MongoClient).db().createCollection(colName);
-        });
-    }
-
     private mongodbOperation(): DbOperation {
         return async (callback) => {
             const connection = await MongoClient.connect(MONGO_URI);
@@ -84,6 +63,27 @@ export class DatabaseRepository {
                 mysqlConnection.end();
             }
         }
+    }
+
+    protected async existsCollection(colName: string): Promise<boolean> {
+        return await this.dbOperation(async (client) => {
+            const col = await (client as MongoClient)
+                .db()
+                .listCollections({
+                    name: colName,
+                })
+                .toArray();
+            return col.length > 0;
+        });
+    }
+
+    protected async createCollectionIfNotExists(colName: string): Promise<void> {
+        const colExists = await this.existsCollection(colName);
+        if (colExists) return;
+
+        await this.dbOperation(async (client) => {
+            await (client as MongoClient).db().createCollection(colName);
+        });
     }
 
     protected encryptPassword(password: string): string {

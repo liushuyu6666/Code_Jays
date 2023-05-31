@@ -1,17 +1,25 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // TODO: move to the .env
 const secretKey = 'abcdefg';
 
 export class AuthService {
-    static generateToken(userId: string): string {
+    public generateToken(userId: string): string {
         return jwt.sign({ userId }, secretKey, { expiresIn: '6h' });
     }
 
-    static authenticateToken(token: string): string | jwt.JwtPayload {
+    public authenticateToken(token: string): string | JwtPayload {
         try {
-            const decoded = jwt.verify(token, secretKey);
-            return decoded;
+            const decodedToken = jwt.verify(token, secretKey);
+            const expirationTime = (decodedToken as JwtPayload).exp;
+
+            const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+
+            if(!expirationTime || currentTime > expirationTime) {
+                throw new Error('The token is expired');
+            }
+
+            return decodedToken;
         } catch (error) {
             throw error;
         }

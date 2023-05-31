@@ -8,12 +8,13 @@ import {
 export interface ImageRepository {
     createImage(
         imageId: string,
+        userId: string,
         fileName: string,
         url: string,
         uploadDate: Date,
     ): Promise<Image>;
 
-    listImages(): Promise<Image[] | undefined>;
+    listImages(userId: string): Promise<Image[] | undefined>;
 }
 
 export class MongodbImageRepository
@@ -26,35 +27,37 @@ export class MongodbImageRepository
 
     async createImage(
         imageId: string,
+        userId: string,
         fileName: string,
         key: string,
         uploadDate: Date,
     ): Promise<Image> {
-        this.createCollectionIfNotExists('Image');
+        await this.createCollectionIfNotExists('Image');
 
         const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         await this.dbOperation(async (client) => {
             const col = (client as MongoClient).db().collection('Image');
             return col.insertOne({
                 imageId,
+                userId,
                 fileName,
                 url,
                 uploadDate,
             });
         });
 
-        return new Image(imageId, fileName, url, uploadDate);
+        return new Image(imageId, userId, fileName, url, uploadDate);
     }
 
     // TODO: pagination
-    async listImages(): Promise<Image[] | undefined> {
-        this.createCollectionIfNotExists('Image');
+    async listImages(userId: string): Promise<Image[] | undefined> {
+        await this.createCollectionIfNotExists('Image');
 
         const imagesWithId = await this.dbOperation(async (client) => {
             return (client as MongoClient)
                 .db()
                 .collection('Image')
-                .find({})
+                .find({ userId })
                 .toArray();
         });
 
@@ -65,6 +68,7 @@ export class MongodbImageRepository
         return imagesWithId.map((image) => {
             return new Image(
                 image.imageId,
+                userId,
                 image.fileName,
                 image.url,
                 image.uploadDate,
@@ -84,6 +88,7 @@ export class MysqlImageRepository
 
     async createImage(
         imageId: string,
+        userId: string,
         fileName: string,
         key: string,
         uploadDate: Date,
@@ -92,27 +97,28 @@ export class MysqlImageRepository
 
         const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         const sql =
-            'INSERT INTO image (imageId, fileName, url, uploadDate) VALUES (?, ?, ?, ?)';
-        const values = [imageId, fileName, url, uploadDate];
+            'INSERT INTO image (imageId, userId, fileName, url, uploadDate) VALUES (?, ?, ?, ?, ?)';
+        const values = [imageId, userId, fileName, url, uploadDate];
 
         await this.execSql(sql, values);
 
-        return new Image(imageId, fileName, url, uploadDate);
+        return new Image(imageId, userId, fileName, url, uploadDate);
     }
 
     // TODO: pagination
-    async listImages(): Promise<Image[] | undefined> {
+    async listImages(userId: string): Promise<Image[] | undefined> {
         if(!await this.existsTable('image')) {
             return undefined;
         }
 
-        const sql = 'SELECT * FROM image';
+        const sql = 'SELECT * FROM image where userId = ?';
 
-        const results = await this.execSql(sql, []);
+        const results = await this.execSql(sql, [userId]);
         if (results) {
             const temp = results.map((result: any) => {
                 return new Image(
                     result.imageId,
+                    userId,
                     result.fileName,
                     result.url,
                     result.uploadDate,

@@ -2,9 +2,12 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { ImageService } from './ImageService';
 import { Request, Response } from 'express';
 import { DatabaseType } from '../Database/DatabaseRepository';
+import { AuthService } from '../Auth/AuthService';
+import { JwtPayload } from 'jsonwebtoken';
 
 export class ImageController {
     private imageService: ImageService;
+    private authService: AuthService;
 
     constructor(
         databaseType: DatabaseType,
@@ -16,6 +19,7 @@ export class ImageController {
             s3Client,
             bucketName,
         );
+        this.authService = new AuthService();
     }
 
     async uploadImageToS3(
@@ -23,6 +27,7 @@ export class ImageController {
         res: Response,
     ): Promise<Response<any, Record<string, any>>> {
         const { imageName } = req.body;
+        const { authorization } = req.headers;
         const file = req.file; // Multer will load the image to req.file.
 
         if (!file || !imageName) {
@@ -31,9 +36,18 @@ export class ImageController {
                 .json({ error: 'Image or image name are required' });
         }
 
+        if (!authorization) {
+            return res.status(401).json({
+                error: 'Unauthorized',
+            });
+        }
+
+        const { userId } = this.authService.authenticateToken(authorization) as JwtPayload;
+
         const insertedImage = await this.imageService.uploadImage(
             imageName,
             file,
+            userId as unknown as string
         );
 
         if (!insertedImage) {
@@ -48,10 +62,20 @@ export class ImageController {
     }
 
     async listImages(
-        _: Request,
+        req: Request,
         res: Response,
     ): Promise<Response<any, Record<string, any>>> {
-        const images = await this.imageService.listImages();
+        const { authorization } = req.headers;
+
+        if (!authorization) {
+            return res.status(401).json({
+                error: 'Unauthorized',
+            });
+        }
+
+        const { userId } = this.authService.authenticateToken(authorization) as JwtPayload;
+
+        const images = await this.imageService.listImages(userId as unknown as string);
 
         if (!images) {
             return res

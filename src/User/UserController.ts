@@ -5,9 +5,11 @@ import { DatabaseType } from "../Database/DatabaseRepository";
 
 export class UserController {
     private userService: UserService;
+    private authService: AuthService;
 
     constructor(databaseType: DatabaseType) {
         this.userService = new UserService(databaseType);
+        this.authService = new AuthService();
     }
 
     async registerUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
@@ -38,7 +40,7 @@ export class UserController {
         }
 
         // TODO: add logger to display the login user
-        const token = AuthService.generateToken(userId);
+        const token = this.authService.generateToken(userId);
         return res.status(200).json({ message: 'User logged in successfully', token });
     }
 }
