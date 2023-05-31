@@ -133,6 +133,7 @@ export class DatabaseRepository {
         const sql = `
             CREATE TABLE image (
                 imageId VARCHAR(255) PRIMARY KEY,
+                userId VARCHAR(255) NOT NULL,
                 fileName VARCHAR(255) NOT NULL,
                 url VARCHAR(255) NOT NULL,
                 uploadDate TIMESTAMP NOT NULL

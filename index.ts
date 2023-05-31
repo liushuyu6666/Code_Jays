@@ -7,8 +7,9 @@ import { DatabaseType } from './src/Database/DatabaseRepository';
 
 const app = express();
 const port = 3000;
-// TODO: in .env
-const databaseType = DatabaseType.MongoDB;
+
+// TODO: in launchdarkly
+const databaseType = DatabaseType.MySQL;
 
 // const upload = multer({ dest: 'uploads/' }) load files to the uploads folder.
 const upload = multer({});
