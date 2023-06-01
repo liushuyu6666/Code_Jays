@@ -2,6 +2,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { DatabaseType } from '../../src/Database/DatabaseRepository';
 import { ImageService } from '../../src/Image/ImageService';
 import { Image } from '../../src/Image/Image';
+import { S3Repository } from '../../src/S3/S3Repository';
 
 const mockImage1 = new Image(
     'imageId',
@@ -24,26 +25,13 @@ jest.mock('../../src/Image/ImageRepository', () => {
     };
 });
 
-// TODO: 1, use variable
-// TODO: 2, another way to mock S3Repositoryj
-jest.mock('../../src/S3/S3Repository', () => {
-    return {
-        S3Repository: jest.fn().mockImplementation(() => {
-            return {
-                uploadFile: jest
-                    .fn()
-                    .mockResolvedValueOnce('url')
-                    .mockResolvedValueOnce(undefined),
-            };
-        }),
-    };
-});
-
 describe('Test ImageService', () => {
     let imageService: ImageService;
     let mockS3Client: jest.Mocked<S3Client>;
+    let mockFile: Express.Multer.File;
 
     beforeAll(() => {
+        mockFile = {} as unknown as Express.Multer.File;
         imageService = new ImageService(
             DatabaseType.MySQL,
             mockS3Client,
@@ -57,8 +45,7 @@ describe('Test ImageService', () => {
 
     describe('uploadImage', () => {
         it('should upload an image and create an entry in the repository', async () => {
-            const mockFile: Express.Multer.File =
-                {} as unknown as Express.Multer.File;
+            jest.spyOn(S3Repository.prototype, 'uploadFile').mockResolvedValue('url');
 
             const mockImage = await imageService.uploadImage(
                 'fileName',
@@ -70,8 +57,7 @@ describe('Test ImageService', () => {
         });
 
         it('should return undefined if url is undefined', async () => {
-            const mockFile: Express.Multer.File =
-                {} as unknown as Express.Multer.File;
+            jest.spyOn(S3Repository.prototype, 'uploadFile').mockResolvedValue(undefined);
 
             const mockImage = await imageService.uploadImage(
                 'fileName',
