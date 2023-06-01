@@ -14,9 +14,10 @@ export class ImageService {
         s3Client: S3Client,
         bucketName: string,
     ) {
+        this.s3Repository = new S3Repository(s3Client, bucketName);
         this.imageRepository =
             ImageRepositoryFactory.createImageRepository(databaseType);
-        this.s3Repository = new S3Repository(s3Client, bucketName);
+        
     }
 
     async uploadImage(

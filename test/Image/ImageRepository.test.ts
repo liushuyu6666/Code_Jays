@@ -48,7 +48,7 @@ describe('Test MongodbImageRepository', () => {
         test('should return the image', async () => {
             jest.spyOn(mongodbImageRepository, 'createCollectionIfNotExists').mockResolvedValue(undefined);
 
-            const insertedImage = await mongodbImageRepository.createImage('1', 'image', 'key', date);
+            const insertedImage = await mongodbImageRepository.createImage('1', 'user1', 'image', 'key', date);
 
             expect(mongodbImageRepository.createCollectionIfNotExists).toHaveBeenCalledTimes(1);
             expect(MongoClient.connect).toHaveBeenCalledTimes(1);
@@ -63,7 +63,7 @@ describe('Test MongodbImageRepository', () => {
         test('should return all images if exists', async () => {
             jest.spyOn(mongodbImageRepository, 'existsCollection').mockResolvedValue(true);
 
-            const images = await mongodbImageRepository.listImages();
+            const images = await mongodbImageRepository.listImages('user1');
 
             expect(mongodbImageRepository.existsCollection).toHaveBeenCalledTimes(1);
             expect(MongoClient.connect).toHaveBeenCalledTimes(1);
@@ -76,7 +76,7 @@ describe('Test MongodbImageRepository', () => {
         test('should return undefined if the collection does not exist', async () => {
             jest.spyOn(mongodbImageRepository, 'existsCollection').mockResolvedValue(false);
 
-            const result = await mongodbImageRepository.listImages();
+            const result = await mongodbImageRepository.listImages('user1');
 
             expect(mongodbImageRepository.existsCollection).toHaveBeenCalledTimes(1);
             expect(MongoClient.connect).not.toHaveBeenCalled();
@@ -106,7 +106,7 @@ describe('Test MysqlImageRepository', () => {
             jest.spyOn(mysqlImageRepository, 'createImageTableIfNotExists').mockResolvedValue(undefined);
             jest.spyOn(mysqlImageRepository, 'execSql').mockResolvedValue(undefined);
 
-            const insertedImage = await mysqlImageRepository.createImage('1', 'image', 'key', date);
+            const insertedImage = await mysqlImageRepository.createImage('1', 'user1', 'image', 'key', date);
 
             expect(mysqlImageRepository.createImageTableIfNotExists).toHaveBeenCalledTimes(1);
             expect(mysqlImageRepository.execSql).toHaveBeenCalledTimes(1);
@@ -132,7 +132,7 @@ describe('Test MysqlImageRepository', () => {
                 }
             ]);
 
-            const images = await mysqlImageRepository.listImages();
+            const images = await mysqlImageRepository.listImages('user1');
 
             expect(mysqlImageRepository.existsTable).toHaveBeenCalledTimes(1);
             expect(mysqlImageRepository.execSql).toHaveBeenCalledTimes(1);
@@ -143,7 +143,7 @@ describe('Test MysqlImageRepository', () => {
             jest.spyOn(mysqlImageRepository, 'existsTable').mockResolvedValue(false);
             jest.spyOn(mysqlImageRepository, 'execSql').mockResolvedValue(undefined);
 
-            const result = await mysqlImageRepository.listImages();
+            const result = await mysqlImageRepository.listImages('user1');
 
             expect(mysqlImageRepository.existsTable).toHaveBeenCalledTimes(1);
             expect(mysqlImageRepository.execSql).not.toHaveBeenCalled();
