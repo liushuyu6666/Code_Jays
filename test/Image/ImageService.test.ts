@@ -30,7 +30,7 @@ describe('Test ImageService', () => {
     let mockS3Client: jest.Mocked<S3Client>;
     let mockFile: Express.Multer.File;
 
-    beforeAll(() => {
+    beforeEach(() => {
         mockFile = {} as unknown as Express.Multer.File;
         imageService = new ImageService(
             DatabaseType.MySQL,
@@ -39,7 +39,7 @@ describe('Test ImageService', () => {
         );
     });
 
-    afterAll(() => {
+    afterEach(() => {
         jest.clearAllMocks();
     });
 
