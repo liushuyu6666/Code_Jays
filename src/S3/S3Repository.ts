@@ -10,17 +10,17 @@ export class S3Repository {
         this.bucketName = bucketName
     }
 
-    private async existsBucket(bucketName: string): Promise<boolean> {
+    public async existsBucket(bucketName: string): Promise<boolean> {
         const headBucketCommand = new HeadBucketCommand({ Bucket: bucketName });
         try {
             await this.s3Client.send(headBucketCommand);
             return true;
         } catch {
-            return false
+            return false;
         }
     }
 
-    async uploadFile(fileId: string, fileContent: Express.Multer.File, prefix?: string): Promise<string | undefined> {
+    public async uploadFile(fileId: string, fileContent: Express.Multer.File, prefix?: string): Promise<string | undefined> {
         if(!(await this.existsBucket(this.bucketName))) {
             return undefined;
         }
