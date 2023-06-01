@@ -42,12 +42,14 @@ export class ImageController {
             });
         }
 
-        const { userId } = this.authService.authenticateToken(authorization) as JwtPayload;
+        const { userId } = this.authService.authenticateToken(
+            authorization,
+        ) as JwtPayload;
 
         const insertedImage = await this.imageService.uploadImage(
             imageName,
             file,
-            userId as unknown as string
+            userId as unknown as string,
         );
 
         if (!insertedImage) {
@@ -73,9 +75,13 @@ export class ImageController {
             });
         }
 
-        const { userId } = this.authService.authenticateToken(authorization) as JwtPayload;
+        const { userId } = this.authService.authenticateToken(
+            authorization,
+        ) as JwtPayload;
 
-        const images = await this.imageService.listImages(userId as unknown as string);
+        const images = await this.imageService.listImages(
+            userId as unknown as string,
+        );
 
         if (!images) {
             return res
@@ -85,9 +91,12 @@ export class ImageController {
                 })
                 .end();
         } else {
-            return res.json({
-                images,
-            });
+            return res
+                .status(200)
+                .json({
+                    images,
+                })
+                .end();
         }
     }
 }

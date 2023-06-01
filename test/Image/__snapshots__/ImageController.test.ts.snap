@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImageController listImage return 200 if got images 1`] = `
+[MockFunction] {
+  "calls": [
+    [
+      {
+        "images": [
+          Image {
+            "fileName": "fileName",
+            "imageId": "imageId",
+            "uploadDate": 2000-01-01T00:00:00.000Z,
+            "url": "url",
+            "userId": "userId",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": {
+        "end": [MockFunction] {
+          "calls": [
+            [],
+          ],
+          "results": [
+            {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+        "json": [MockFunction] {
+          "calls": [
+            [
+              {
+                "images": [
+                  Image {
+                    "fileName": "fileName",
+                    "imageId": "imageId",
+                    "uploadDate": 2000-01-01T00:00:00.000Z,
+                    "url": "url",
+                    "userId": "userId",
+                  },
+                ],
+              },
+            ],
+          ],
+          "results": [Circular],
+        },
+        "status": [MockFunction] {
+          "calls": [
+            [
+              200,
+            ],
+          ],
+          "results": [
+            {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+      },
+    },
+  ],
+}
+`;
