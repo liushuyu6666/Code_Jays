@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test UserService registerUser should return the new User if no user exists 1`] = `
+User {
+  "email": "email",
+  "password": "hashedPassword",
+  "userId": "userId",
+  "username": "username",
+}
+`;
