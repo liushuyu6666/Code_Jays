@@ -73,6 +73,16 @@ describe('Test MongodbImageRepository', () => {
             expect(images).toMatchSnapshot()
         });
 
+        test('should return undefined if imagesWithId is undefined', async () => {
+            jest.spyOn(mongodbImageRepository, 'existsCollection').mockResolvedValue(true);
+            jest.spyOn(mongodbImageRepository, 'dbOperation').mockResolvedValue(undefined);
+
+            const images = await mongodbImageRepository.listImages('user1');
+
+            expect(mongodbImageRepository.existsCollection).toHaveBeenCalledTimes(1);
+            expect(images).toBe(undefined);
+        });
+
         test('should return undefined if the collection does not exist', async () => {
             jest.spyOn(mongodbImageRepository, 'existsCollection').mockResolvedValue(false);
 
@@ -147,6 +157,17 @@ describe('Test MysqlImageRepository', () => {
 
             expect(mysqlImageRepository.existsTable).toHaveBeenCalledTimes(1);
             expect(mysqlImageRepository.execSql).not.toHaveBeenCalled();
+            expect(result).toBe(undefined);
+        });
+
+        test('should return undefined if the result is undefined', async () => {
+            jest.spyOn(mysqlImageRepository, 'existsTable').mockResolvedValue(true);
+            jest.spyOn(mysqlImageRepository, 'execSql').mockResolvedValue(undefined);
+
+            const result = await mysqlImageRepository.listImages('user1');
+
+            expect(mysqlImageRepository.existsTable).toHaveBeenCalledTimes(1);
+            expect(mysqlImageRepository.execSql).toHaveBeenCalledTimes(1);
             expect(result).toBe(undefined);
         })
     });

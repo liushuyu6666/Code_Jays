@@ -52,6 +52,16 @@ describe('S3Repository', () => {
             expect(S3Repository.prototype.existsBucket).toBeCalledTimes(1);
         });
 
+        test('return key value if bucket exists but not prefix', async () => {
+            jest.spyOn(S3Repository.prototype, 'existsBucket').mockResolvedValue(true);
+            
+            const result = await s3Repository.uploadFile('fileId', {} as unknown as Express.Multer.File);
+
+            expect(result).toBe('files/fileId');
+            expect(S3Repository.prototype.existsBucket).toBeCalledTimes(1);
+            expect(s3Client.send).toBeCalledTimes(1);
+        });
+
         test('return key value if bucket exists', async () => {
             jest.spyOn(S3Repository.prototype, 'existsBucket').mockResolvedValue(true);
             
