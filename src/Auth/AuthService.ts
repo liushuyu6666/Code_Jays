@@ -13,7 +13,7 @@ export class AuthService {
             const decodedToken = jwt.verify(token, secretKey);
             const expirationTime = (decodedToken as JwtPayload).exp;
 
-            const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+            const currentTime = Math.floor(Date.now() / 1000);
 
             if(!expirationTime || currentTime > expirationTime) {
                 throw new Error('The token is expired');
