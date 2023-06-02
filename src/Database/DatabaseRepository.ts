@@ -65,6 +65,7 @@ export class DatabaseRepository {
         }
     }
 
+    /** For Mongodb */
     public async existsCollection(colName: string): Promise<boolean> {
         return await this.dbOperation(async (client) => {
             const col = await (client as MongoClient)
@@ -77,6 +78,7 @@ export class DatabaseRepository {
         });
     }
 
+    /** For Mongodb */
     public async createCollectionIfNotExists(colName: string): Promise<void> {
         const colExists = await this.existsCollection(colName);
         if (colExists) return;
@@ -91,6 +93,7 @@ export class DatabaseRepository {
         return bcrypt.hashSync(password, salt);
     }
 
+    /** For Mysql */
     public async execSql(sql: string, values: (string | Date)[]): Promise<any> {
         return await this.dbOperation(async (client) => {
             return new Promise((res, rej) => {
@@ -102,6 +105,7 @@ export class DatabaseRepository {
         });
     }
 
+    /** For Mysql */
     public async existsTable(table: string): Promise<boolean> {
         const sql = `SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ? LIMIT 1`;
         const values = [DATABASE_NAME, table];
@@ -110,6 +114,7 @@ export class DatabaseRepository {
         return result.length > 0;
     }
 
+    /** For Mysql */
     public async createUserTableIfNotExists(): Promise<void> {
         const tableExists = await this.existsTable('user');
         if(tableExists) return;
@@ -127,6 +132,7 @@ export class DatabaseRepository {
         console.log("Create user table in mysql");
     }
 
+    /** For Mysql */
     public async createImageTableIfNotExists(): Promise<void> {
         const tableExists = await this.existsTable('image');
         if (tableExists) return;

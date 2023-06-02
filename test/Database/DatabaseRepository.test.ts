@@ -1,11 +1,12 @@
 import { MongoClient } from 'mongodb';
+
 import {
     DatabaseRepository,
     DatabaseType,
 } from '../../src/Database/DatabaseRepository';
 import bcrypt from 'bcryptjs';
 
-describe('Test DatabaseRepository', () => {
+describe('Test DatabaseRepository Mongodb', () => {
     let databaseRepository: DatabaseRepository;
 
     beforeEach(() => {
@@ -25,7 +26,7 @@ describe('Test DatabaseRepository', () => {
             mockMongoClient = {
                 db: jest.fn().mockReturnValue({
                     listCollections: jest.fn().mockReturnValue({
-                        toArray: mockToArray
+                        toArray: mockToArray,
                     }),
                 }),
                 close: jest.fn().mockResolvedValue(undefined),
@@ -44,9 +45,7 @@ describe('Test DatabaseRepository', () => {
             // Check the result
             expect(result).toBe(true);
             expect(MongoClient.connect).toHaveBeenCalled();
-            expect(
-                mockMongoClient.db().listCollections,
-            ).toHaveBeenCalled();
+            expect(mockMongoClient.db().listCollections).toHaveBeenCalled();
             expect(
                 mockMongoClient.db().listCollections().toArray,
             ).toHaveBeenCalled();
@@ -61,9 +60,7 @@ describe('Test DatabaseRepository', () => {
             // Check the result
             expect(result).toBe(false);
             expect(MongoClient.connect).toHaveBeenCalled();
-            expect(
-                mockMongoClient.db().listCollections,
-            ).toHaveBeenCalled();
+            expect(mockMongoClient.db().listCollections).toHaveBeenCalled();
             expect(
                 mockMongoClient.db().listCollections().toArray,
             ).toHaveBeenCalled();
@@ -147,7 +144,7 @@ describe('Test DatabaseRepository', () => {
     });
 });
 
-describe('Test DatabaseRepository', () => {
+describe('Test DatabaseRepository Mysql', () => {
     let databaseRepository: DatabaseRepository;
 
     beforeEach(() => {
@@ -160,8 +157,10 @@ describe('Test DatabaseRepository', () => {
 
     describe('execSql', () => {
         test('should return the value', async () => {
-            jest.spyOn(databaseRepository, 'dbOperation').mockResolvedValueOnce('value');
-            
+            jest.spyOn(databaseRepository, 'dbOperation').mockResolvedValueOnce(
+                'value',
+            );
+
             const sql = 'SELECT * FROM users';
             const values = ['John'];
             const result = await databaseRepository.execSql(sql, values);
@@ -173,7 +172,9 @@ describe('Test DatabaseRepository', () => {
 
     describe('existsTable', () => {
         test('should return true if table exists', async () => {
-            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce([{ exists: 1 }]);
+            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce([
+                { exists: 1 },
+            ]);
 
             const result = await databaseRepository.existsTable('user');
 
@@ -193,10 +194,15 @@ describe('Test DatabaseRepository', () => {
 
     describe('createUserTableIfNotExists', () => {
         test('should return undefined if table exists', async () => {
-            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(true);
-            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(undefined);
+            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(
+                true,
+            );
+            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(
+                undefined,
+            );
 
-            const result = await databaseRepository.createUserTableIfNotExists();
+            const result =
+                await databaseRepository.createUserTableIfNotExists();
 
             expect(result).toBe(undefined);
             expect(databaseRepository.existsTable).toHaveBeenCalledTimes(1);
@@ -204,10 +210,15 @@ describe('Test DatabaseRepository', () => {
         });
 
         test('should create a table if it does not exist', async () => {
-            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(false);
-            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(undefined);
+            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(
+                false,
+            );
+            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(
+                undefined,
+            );
 
-            const result = await databaseRepository.createUserTableIfNotExists();
+            const result =
+                await databaseRepository.createUserTableIfNotExists();
 
             expect(result).toBe(undefined);
             expect(databaseRepository.existsTable).toHaveBeenCalledTimes(1);
@@ -217,10 +228,15 @@ describe('Test DatabaseRepository', () => {
 
     describe('createImageTableIfNotExists', () => {
         test('should return undefined if table exists', async () => {
-            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(true);
-            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(undefined);
+            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(
+                true,
+            );
+            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(
+                undefined,
+            );
 
-            const result = await databaseRepository.createImageTableIfNotExists();
+            const result =
+                await databaseRepository.createImageTableIfNotExists();
 
             expect(result).toBe(undefined);
             expect(databaseRepository.existsTable).toHaveBeenCalledTimes(1);
@@ -228,16 +244,28 @@ describe('Test DatabaseRepository', () => {
         });
 
         test('should create a table if it does not exist', async () => {
-            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(false);
-            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(undefined);
+            jest.spyOn(databaseRepository, 'existsTable').mockResolvedValueOnce(
+                false,
+            );
+            jest.spyOn(databaseRepository, 'execSql').mockResolvedValueOnce(
+                undefined,
+            );
 
-            const result = await databaseRepository.createImageTableIfNotExists();
+            const result =
+                await databaseRepository.createImageTableIfNotExists();
 
             expect(result).toBe(undefined);
             expect(databaseRepository.existsTable).toHaveBeenCalledTimes(1);
             expect(databaseRepository.execSql).toHaveBeenCalledTimes(1);
         });
     });
+});
 
+describe('Test DatabaseRepository default', () => {
 
+    test('should throw an error when the database type is invalid', () => {
+        expect(
+            () => new DatabaseRepository('' as unknown as DatabaseType),
+        ).toThrowError('Invalid database type');
+    });
 });
