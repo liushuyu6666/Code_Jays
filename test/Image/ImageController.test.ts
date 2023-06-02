@@ -13,28 +13,6 @@ const insertedImage: Image = new Image(
     new Date(Date.parse('2000-01-01')),
 );
 
-// jest.mock('../../src/Image/ImageService', () => {
-//     return {
-//         ImageService: jest.fn().mockImplementation(() => {
-//             return {
-//                 uploadImage: jest.fn().mockResolvedValue(insertedImage),
-//             };
-//         }),
-//     };
-// });
-
-// jest.mock('../../src/Auth/AuthService', () => {
-//     return {
-//         AuthService: jest.fn().mockImplementation(() => {
-//             return {
-//                 authenticateToken: jest
-//                     .fn()
-//                     .mockReturnValue({ userId: 'userId' }),
-//             };
-//         }),
-//     };
-// });
-
 const mockReqFunc = (authorization: undefined | string, file: undefined | Express.Multer.File) => {
     return {
         body: {
