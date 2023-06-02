@@ -1,5 +1,5 @@
-import { MongodbUserRepository, MysqlUserRepository } from '../../src/User/UserRepository';
-import { DatabaseRepository } from '../../src/Database/DatabaseRepository';
+import { MongodbUserRepository, MysqlUserRepository, UserRepositoryFactory } from '../../src/User/UserRepository';
+import { DatabaseRepository, DatabaseType } from '../../src/Database/DatabaseRepository';
 import { MongoClient } from 'mongodb';
 
 jest.spyOn(DatabaseRepository.prototype, 'encryptPassword').mockReturnValue(
@@ -144,3 +144,25 @@ describe('MysqlUserRepository', () => {
         });
     })
 });
+
+describe('Test UserRepositoryFactory', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('should return MongodbUserRepository if it is MongoDB', () => {
+        const result = UserRepositoryFactory.createUserRepository(DatabaseType.MongoDB);
+        expect(result).toBeInstanceOf(MongodbUserRepository);
+    });
+
+    test('should return MysqlImageRepository if it is Mysql', () => {
+        const result = UserRepositoryFactory.createUserRepository(DatabaseType.MySQL);
+        expect(result).toBeInstanceOf(MysqlUserRepository);
+    });
+
+    test('should throw an error for an invalid database type', () => {
+        expect(() => {
+            UserRepositoryFactory.createUserRepository('InvalidDatabaseType' as unknown as  DatabaseType);
+          }).toThrowError('Invalid database type');
+    });
+})
