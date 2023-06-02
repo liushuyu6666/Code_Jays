@@ -6,7 +6,7 @@ jest.mock('@aws-sdk/client-s3', () => {
         HeadBucketCommand: jest.fn().mockReturnValue({}),
         PutObjectCommand: jest.fn().mockReturnValue({}),
         S3Client: jest.fn().mockImplementation(() => ({
-            send: jest.fn(),
+            send: jest.fn(), // Return value of the method can be modified upon different cases
         })),
     };
 });

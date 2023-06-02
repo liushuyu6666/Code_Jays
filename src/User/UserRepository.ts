@@ -8,7 +8,7 @@ import { DatabaseRepository, DatabaseType } from '../Database/DatabaseRepository
 
 export interface UserRepository {
     addUser(username: string, password: string, email: string): Promise<User>;
-    getUserByEmail(email: string): Promise<User | null>;
+    getUserByEmail(email: string): Promise<User | undefined>;
 }
 
 export class MongodbUserRepository extends DatabaseRepository implements UserRepository {
@@ -21,6 +21,8 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
         password: string,
         email: string,
     ): Promise<User> {
+        await this.createCollectionIfNotExists('User');
+    
         const hashedPassword = super.encryptPassword(password);
 
         // Generate id
@@ -28,7 +30,7 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
 
         await this.dbOperation(async (client) => {
             const col = (client as MongoClient).db().collection('User');
-            return col.insertOne({
+            return await col.insertOne({
                 username,
                 password: hashedPassword,
                 email,
@@ -39,13 +41,17 @@ export class MongodbUserRepository extends DatabaseRepository implements UserRep
         return new User(id, username, hashedPassword, email);
     }
 
-    async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<User | undefined> {
+        if(!await this.existsCollection('User')) {
+            return undefined;
+        }
+
         const user = await this.dbOperation(async (client) => {
             const col = (client as MongoClient).db().collection('User');
-            return col.findOne({ email });
+            return await col.findOne({ email });
         });
 
-        if(!user) return null;
+        if(!user) return undefined;
         return new User(user.userId, user.username, user.password, user.email);
     }
 }
@@ -77,8 +83,10 @@ export class MysqlUserRepository extends DatabaseRepository implements UserRepos
         return new User(id, username, hashedPassword, email);
     }
 
-    async getUserByEmail(email: string): Promise<User | null> {
-        await this.createUserTableIfNotExists();
+    async getUserByEmail(email: string): Promise<User | undefined> {
+        if(!await this.existsTable('user')) {
+            return undefined;
+        }
     
         const sql = 'SELECT * FROM user WHERE email = ? LIMIT 1';
         const values = [email];
@@ -89,7 +97,7 @@ export class MysqlUserRepository extends DatabaseRepository implements UserRepos
             const userInfo = result[0];
             return new User(userInfo.userId, userInfo.username, userInfo.password, userInfo.email);
         } else {
-            return null;
+            return undefined;
         }
     }
 }

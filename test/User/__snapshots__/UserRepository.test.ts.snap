@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MongodbUserRepository addUser should return the User 1`] = `
+User {
+  "email": "email",
+  "password": "hashedPassword",
+  "userId": "mocked-uuid",
+  "username": "username",
+}
+`;
+
+exports[`MongodbUserRepository getUserByEmail should return the user if it exists 1`] = `
+User {
+  "email": "email2",
+  "password": undefined,
+  "userId": "userId2",
+  "username": "username2",
+}
+`;
+
+exports[`MysqlUserRepository addUser should return the inserted user 1`] = `
+User {
+  "email": "email@mysql",
+  "password": "hashedPassword",
+  "userId": "mocked-uuid",
+  "username": "username_mysql",
+}
+`;
+
+exports[`MysqlUserRepository getUserByEmail should return the user if it exists 1`] = `
+User {
+  "email": "email2@mysql",
+  "password": undefined,
+  "userId": "userId2_mysql",
+  "username": "username2_mysql",
+}
+`;

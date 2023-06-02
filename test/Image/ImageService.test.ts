@@ -45,6 +45,7 @@ describe('Test ImageService', () => {
 
     describe('uploadImage', () => {
         it('should upload an image and create an entry in the repository', async () => {
+            // Return value of the method can be modified upon different cases
             jest.spyOn(S3Repository.prototype, 'uploadFile').mockResolvedValue('url');
 
             const mockImage = await imageService.uploadImage(
